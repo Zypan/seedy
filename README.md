@@ -6,5 +6,5 @@ You can configure the hostname and user berfore running the script:
 ````
 export SEEDY_HOST=sammy.example.com
 export RTORRENT_USER=marco
-./seedy
+wget -O - https://raw.githubusercontent.com/thde/seedy/master/seedy.sh | ash
 ````
