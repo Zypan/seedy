@@ -9,15 +9,15 @@ RTORRENT_USER=${RTORRENT_USER:-rt}
 
 mkdir "$SEEDY_TMPDIR/logs"
 
+echo ""
+echo " Installing new Seedbox... "
+echo ""
+
 _SEEDY_PRINT_INFO () {
-  echo ""
-  echo " Installing new Seedbox... "
-  echo ""
   echo " Temporary folder: $SEEDY_TMPDIR"
   echo " Hostname: $SEEDY_HOST"
-  echo " rTorrent user: $RTORRENT_USER"
-  echo " Web user: $WWW_USER"
-  echo " Web password: $WWW_PASSWORD"
+  echo " User: $RTORRENT_USER"
+  echo " Web auth: $WWW_PASSWORD"
 }
 
 _SEEDY_UPDATE_SYSTEM () {
@@ -64,8 +64,6 @@ _SEEDY_ADD_USER () {
   mkdir -p "/home/$RTORRENT_USER/watch"
   mkdir -p "/home/$RTORRENT_USER/files/incomplete"
   mkdir "/home/$RTORRENT_USER/.ssh"
-
-  curl -s https://github.com/thde.keys > /home/$RTORRENT_USER/.ssh/authorized_keys
 
   chmod -R 600 /home/$RTORRENT_USER/.ssh
   chmod 700 /home/$RTORRENT_USER/.ssh
@@ -197,7 +195,6 @@ _SEEDY_START () {
   service rtorrentd start
 }
 
-_SEEDY_PRINT_INFO | tee  $SEEDY_TMPDIR/logs/info.log
 _SEEDY_UPDATE_SYSTEM &> $SEEDY_TMPDIR/logs/update.log
 _SEEDY_INSTALL_SOFTWARE &> $SEEDY_TMPDIR/logs/install.log
 _SEEDY_ADD_USER &> $SEEDY_TMPDIR/logs/user.log
@@ -207,3 +204,4 @@ _SEEDY_INSTALL_PHP &> $SEEDY_TMPDIR/logs/php.log
 _SEEDY_INSTALL_RUTORRENT &> $SEEDY_TMPDIR/logs/rutorrent.log
 _SEEDY_CONFIG_FIREWALL &> $SEEDY_TMPDIR/logs/firewall.log
 _SEEDY_START &> $SEEDY_TMPDIR/logs/start.log
+_SEEDY_PRINT_INFO | tee  $SEEDY_TMPDIR/logs/info.log
