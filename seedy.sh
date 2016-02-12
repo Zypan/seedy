@@ -27,14 +27,14 @@ _SEEDY_UPDATE_SYSTEM () {
 _SEEDY_INSTALL_MEDIAINFO_SOURCE () {
   mkdir $SEEDY_TMPDIR/mediainfo
   cd $SEEDY_TMPDIR/mediainfo
-  apk add build-base
+  apk add build-base file
 
-  curl http://mediaarea.net/download/bin/mediainfo/0.7.82/MediaInfo_CLI_0.7.82_GNU_FromSource.tar.xz --output mediainfo.tar.xz
+  curl http://mediaarea.net/download/binary/mediainfo/0.7.82/MediaInfo_CLI_0.7.82_GNU_FromSource.tar.xz --output mediainfo.tar.xz
   tar xJf mediainfo.tar.xz
   cd MediaInfo_CLI_GNU_FromSource && ./CLI_Compile.sh
   cd MediaInfo/Project/GNU/CLI && make install
 
-  apk del build-base
+  apk del build-base file
   cd $SEEDY_CURDIR
 }
 
@@ -55,7 +55,7 @@ _SEEDY_INSTALL_SOFTWARE () {
   php-cli \
   php-json
 
-  #_SEEDY_INSTALL_MEDIAINFO_SOURCE
+  _SEEDY_INSTALL_MEDIAINFO_SOURCE
 }
 
 _SEEDY_ADD_USER () {
