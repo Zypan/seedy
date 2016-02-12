@@ -1,0 +1,91 @@
+user nginx;
+worker_processes 4;
+pid /var/run/nginx.pid;
+
+events {
+	worker_connections 768;
+	multi_accept on;
+}
+worker_rlimit_nofile 1536;
+
+http {
+
+	##
+	# Basic Settings
+	##
+
+	sendfile on;
+	tcp_nopush on;
+	tcp_nodelay on;
+	keepalive_timeout 65;
+	types_hash_max_size 2048;
+	server_tokens off;
+
+	# server_names_hash_bucket_size 64;
+	# server_name_in_redirect off;
+
+	include /etc/nginx/mime.types;
+	default_type application/octet-stream;
+
+	##
+	# SSL Settings
+	## 
+
+	ssl_session_cache shared:SSL:10m;
+	ssl_session_timeout 10m;
+
+	ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+	ssl_ciphers   EECDH+CHACHA20:EECDH+AES128:RSA+AES128:EECDH+AES256:RSA+AES256:EECDH+3DES:RSA+3DES:!MD5;
+	ssl_prefer_server_ciphers on;
+	# ssl_dhparam /etc/ssl/private/DH/dh4096.pem;
+
+	##
+	# Logging Settings
+	##
+
+	access_log off;
+	#access_log /var/log/nginx/access.log;
+	error_log /var/log/nginx/error.log;
+
+	##
+	# Gzip Settings
+	##
+
+	gzip on;
+	gzip_disable "msie6";
+
+	gzip_vary on;
+	gzip_proxied any;
+	gzip_comp_level 6;
+	gzip_buffers 16 8k;
+	gzip_http_version 1.1;
+	gzip_types text/plain text/css application/json application/javascript application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+
+	##
+	# Cache
+	##
+
+	expires 1m;
+
+	proxy_cache_path /var/cache/nginx keys_zone=one:10m
+		         loader_threshold=300 loader_files=200
+                         max_size=500m;
+
+	proxy_cache_valid 200 8m;
+	proxy_cache_valid 404 5m;
+	proxy_hide_header Etag;
+	proxy_cache_min_uses 1;
+
+	open_file_cache          max=10000 inactive=10m;
+	open_file_cache_valid    2m;
+	open_file_cache_min_uses 1;
+	open_file_cache_errors   on;
+
+	##
+	# Virtual Host Configs
+	##
+
+	include /etc/nginx/conf.d/*.conf;
+	include /etc/nginx/sites-enabled/*;
+}
+

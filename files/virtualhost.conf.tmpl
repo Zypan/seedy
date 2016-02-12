@@ -1,0 +1,47 @@
+server {
+	listen 443 ssl spdy;
+	listen [::]:443 ssl spdy;
+	server_name TMPLHOSTNAME;
+
+	ssl_certificate /etc/ssl/private/self/TMPLHOSTNAME.crt;
+	ssl_certificate_key /etc/ssl/private/self/TMPLHOSTNAME.key;
+
+	# add_header Strict-Transport-Security "max-age=31536000";
+	add_header X-Frame-Options DENY;
+	add_header X-XSS-Protection: "1; mode=block";
+	add_header X-Content-Type-Options nosniff;
+	# add_header X-Cache $upstream_cache_status;
+
+	auth_basic "Restricted";
+	auth_basic_user_file /etc/nginx/htpasswd;
+
+	client_max_body_size 10M;
+
+	root /var/www/html;
+
+        # Add index.php to the list if you are using PHP
+        index index.html index.htm index.nginx-debian.html;
+
+        location / {
+                try_files $uri $uri/ =404;
+        }
+
+        include fastcgi.conf;
+
+	location ~ \.php$ {
+                try_files $uri =404;
+                fastcgi_pass unix:/var/run/php5-fpm.sock;
+                fastcgi_index index.php;
+                fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+                include fastcgi_params;
+        }
+
+	location /RPC2 {
+		include fastcgi_params;
+		fastcgi_pass unix:/var/run/php5-fpm.sock;
+	}
+
+	location ~ /\. {
+               deny all;
+        }
+}

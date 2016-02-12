@@ -1,0 +1,148 @@
+######################################################################
+#
+#  Optimized rtorrent.rc
+#
+######################################################################
+
+#################################################
+## General settings                            ##
+#################################################
+
+encoding.add = UTF-8
+pieces.hash.on_completion.set = no
+pieces.memory.max.set = TMPLRAMM
+
+#################################################
+## File handling                               ##
+#################################################
+
+# location where new torrent data is placed, and where you should place your
+# 'complete' data before you place your *.torrent file into the watch folder
+directory.default.set = ~/files/incomplete
+
+# schedule a timer event named 'watch_directory_1':
+# 1) triggers 10 seconds after rtorrent starts
+# 2) triggers at 10 second intervals thereafter
+# 3) Upon trigger, attempt to load (and start) new *.torrent files found in /home/user/torrents/watch/
+# 4) set a variable named 'custom1' with the value "/home/user/torrents/complete"
+# NOTE: if you do not want it to automatically start the torrent, change 'load_start' to 'load'
+schedule = watch_directory_1,10,10,"load_start=~/watch/audionews.org/*.torrent,d.set_custom1=~/files/audionews.org"
+schedule = watch_directory_2,10,10,"load_start=~/watch/awesome-hd.net-movies/*.torrent,d.set_custom1=~/files/awesome-hd.net-movies"
+schedule = watch_directory_21,10,10,"load_start=~/watch/awesome-hd.net-series/*.torrent,d.set_custom1=~/files/awesome-hd.net-series"
+schedule = watch_directory_4,10,10,"load_start=~/watch/broadcasthe.net/*.torrent,d.set_custom1=~/files/broadcasthe.net"
+schedule = watch_directory_5,10,10,"load_start=~/watch/what.cd/*.torrent,d.set_custom1=~/files/what.cd"
+schedule = watch_directory_6,10,10,"load_start=~/watch/brokenstones.me/*.torrent,d.set_custom1=~/files/brokenstones.me"
+schedule = watch_directory_7,10,10,"load_start=~/watch/passthepopcorn.me/*.torrent,d.set_custom1=~/files/passthepopcorn.me"
+
+
+# insert a method with the alias 'checkdirs1'
+# 1) returns true if the current path of the torrent data is not equal to the value of custom1
+# 2) otherwise, returns false
+system.method.insert=checkdirs1,simple,"not=\"$equal={d.get_custom1=,d.get_base_path=}\""
+
+# insert a method with the alias 'movecheck1'
+# 1) returns true if all 3 commands return true ('result of checkdirs1' && 'torrent is 100% done', 'custom1 variable is set')
+# 2) otherwise, returns false
+system.method.insert=movecheck1,simple,"and={checkdirs1=,d.get_complete=,d.get_custom1=}"
+
+# insert a method with the alias 'movedir1'
+# (a series of commands, separated by ';')
+# 1) "set path of torrent to equal the value of custom1";
+# 2) "mv -n <current data path> <custom1 path>";
+# 3) "clear custom1", "stop the torrent","resume the torrent"
+# 4) stop the torrent
+# 5) start the torrent (to get the torrent to update the 'base path')
+system.method.insert=movedir1,simple,"d.set_directory=$d.get_custom1=;execute=mv,-n,$d.get_base_path=,$d.get_custom1=;d.set_custom1=;d.stop=;d.start="
+
+# set a key with the name 'move_hashed1' that is triggered by the hash_done event.
+# 1) When hashing of a torrent completes, this custom key will be triggered.
+# 2) when triggered, execute the 'movecheck1' method and check the return value.
+# 3) if the 'movecheck' method returns 'true', execute the 'movedir1' method we inserted above.
+# NOTE-0: *Only* data that has had their hash checked manually with ^R [^R = Control r].
+# Or on a rtorrent restart[which initiates a hash check]. Will the data move; ~/torrents/incomplete => ~/torrents/complete for example.
+# NOTE-1: 'branch' is an 'if' conditional statement: if(movecheck1){movedir1}
+system.method.set_key=event.download.finished,move_downloaded1,"branch={$movecheck1=,movedir1=}"
+
+# If there's less than 5GB of disk space, it will stop torrents from
+# downloading.
+schedule = low_diskspace,5,60,close_low_diskspace=5120M
+
+# This chmods the downloaded files to 770.  This will allow them to be deleted
+# by w/ruTorrent, while not allowing any other users to touch them.
+system.umask.set = 007
+
+#################################################
+## Connection settings                         ##
+#################################################
+
+# set whether the client should try to connect to UDP trackers
+trackers.use_udp.set = yes
+
+# Upload/download rate in KB/s. 0 for unlimited
+throttle.global_down.max_rate.set_kb = 0
+throttle.global_up.max_rate.set_kb = 0
+
+# Maximum and minimum number of peers to connect to per torrent.
+min_peers = 1
+max_peers = 1024
+
+# Same as above but for seeding completed torrents (-1 = same as downloading)
+min_peers_seed = 1
+max_peers_seed = 1024
+
+# Maximum number of simultanious uploads per torrent.
+max_uploads = 128
+
+# Example of stop on ratio: Stops if ratio's 2.00 with at least 200MB up,
+# otherwise stop at a ratio of 20.00
+#schedule = ratio,60,60,"stop_on_ratio=200,200M,2000"
+
+# port range to use for listening
+network.port_range.set = 61000-61100
+
+# start opening ports at a random position within the port range
+network.port_random.set = yes
+
+# encryption options, set to none (default) or any combination of the following:
+# allow_incoming, try_outgoing,require,require_RC4,enable_retry,pref er_plaintext
+protocol.encryption.set = allow_incoming,enable_retry,try_outgoing
+
+#################################################
+## ruTorrent settings                          ##
+#################################################
+
+# XMLRPC Size Limit
+# This should allow ~3200 torrents in ruTorrent.  Any higher and I'd be surprised
+# if ruTorrent could handle it.
+set_xmlrpc_size_limit = 2097152
+
+# ruTorrent plugins
+execute = {sh,-c,/usr/bin/php /var/www/html/php/initplugins.php &}
+
+# Port to connect
+scgi_port = 127.0.0.1:5000
+
+#################################################
+## Tracker settings                            ##
+#################################################
+
+# enable peer exchange (for torrents not marked private)
+# protocol.pex.set = no
+peer_exchange = no
+
+# enable DHT support for trackerless torrents or when all trackers are down
+# may be set to "disable" (completely disable DHT), "off" (do not start DHT),
+# "auto" (start and stop DHT as needed), or "on" (start DHT immediately)
+# the default is "off". for DHT to work, a session directory must be defined
+dht.mode.set = off
+
+# enable peer exchange (for torrents not marked private)
+protocol.pex.set = no
+
+#########################################
+## Session settings                    ##
+#########################################
+
+## Periodically save session data
+schedule = session_save,300,300,session_save=
+session.path.set = ~/.rtorrent/session
