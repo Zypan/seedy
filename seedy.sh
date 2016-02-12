@@ -36,7 +36,6 @@ _SEEDY_INSTALL_MEDIAINFO_SOURCE () {
 
 _SEEDY_INSTALL_SOFTWARE () {
   apk add \
-  curl \
   openrc \
   iptables \
   ip6tables \
