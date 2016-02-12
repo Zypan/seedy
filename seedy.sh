@@ -36,7 +36,7 @@ _SEEDY_INSTALL_MEDIAINFO_SOURCE () {
 
 _SEEDY_INSTALL_SOFTWARE () {
   apk add \
-  bash \
+  curl \
   openrc \
   iptables \
   ip6tables \
@@ -70,7 +70,7 @@ _SEEDY_ADD_USER () {
 }
 
 _SEEDY_INSTALL_RTORRENT () {
- cp -f files/rtorrent.rc.tmpl /home/$RTORRENT_USER/.rtorrent.rc
+ curl -s https://raw.githubusercontent.com/thde/seedy/master/files/rtorrent.rc.tmpl > /home/$RTORRENT_USER/.rtorrent.rc
  SYSTEMRAM=$(cat /proc/meminfo | grep MemTotal | awk '{ print $2 }')
  ROTRRENTRAM=$(expr $SYSTEMRAM / 1024 \* 90 / 100)
  sed -i s/TMPLRAM/$ROTRRENTRAM/g /home/$RTORRENT_USER/.rtorrent.rc
@@ -81,7 +81,7 @@ _SEEDY_INSTALL_RTORRENT () {
  chown -R $RTORRENT_USER:nginx /home/$RTORRENT_USER/.rtorrent/session
  chmod g+s /home/$RTORRENT_USER/.rtorrent/session
 
- cp -f files/rtorrentd.init.tmpl /etc/init.d/rtorrentd
+ curl -s https://raw.githubusercontent.com/thde/seedy/master/files/rtorrentd.init.tmpl > /etc/init.d/rtorrentd
  sed -i s/TMPLUSER/$RTORRENT_USER/g /etc/init.d/rtorrentd
  chmod +x /etc/init.d/rtorrentd
  rc-update add rtorrentd
@@ -103,9 +103,9 @@ _SEEDY_INSTALL_NGINX () {
   chown $WWW_USER:$WWW_USER /var/cache/nginx
 
   cp -f /etc/nginx/nginx.conf /etc/nginx/nginx.conf.orig
-  cp -f files/nginx.conf.tmpl /etc/nginx/nginx.conf
+  curl -s https://raw.githubusercontent.com/thde/seedy/master/files/nginx.conf.tmpl > /etc/nginx/nginx.conf
 
-  cp -f files/virtualhost.conf.tmpl /etc/nginx/conf.d/$SEEDY_HOST.conf
+  curl -s https://raw.githubusercontent.com/thde/seedy/master/files/virtualhost.conf.tmpl > /etc/nginx/conf.d/$SEEDY_HOST.conf
   sed -i s/TMPLHOSTNAME/$SEEDY_HOST/g /etc/nginx/conf.d/$SEEDY_HOST.conf
 
   rc-update add nginx
@@ -133,7 +133,7 @@ _SEEDY_INSTALL_RUTORRENT () {
   rm -rf /var/www/html/plugins/rss
   rm -rf /var/www/html/plugins/rssurlrewrite
   rm -rf /var/www/html/plugins/unpack
-  
+
   chown -R nginx:nginx /var/www/html/share/
 }
 
