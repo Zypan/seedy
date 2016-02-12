@@ -1,20 +1,24 @@
-#!/bin/bash
+#!/bin/ash
 
 SEEDY_TMPDIR=$(mktemp -d)
 SEEDY_CURDIR="$PWD"
-mkdir "$SEEDY_TMPDIR/logs"
 SEEDY_HOST=${SEEDY_HOST:-$(hostname)}
 WWW_USER=${WWW_USER:-nginx}
+WWW_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c15)
 RTORRENT_USER=${RTORRENT_USER:-rt}
 
-echo ""
-echo " Installing new Seedbox "
-echo " ========================"
-echo " Temporary folder: $SEEDY_TMPDIR"
-echo " Hostname: $SEEDY_HOST"
-echo " rTorrent user: $RTORRENT_USER"
-echo " Web user: $WWW_USER"
-echo ""
+mkdir "$SEEDY_TMPDIR/logs"
+
+_SEEDY_PRINT_INFO () {
+  echo ""
+  echo " Installing new Seedbox... "
+  echo ""
+  echo " Temporary folder: $SEEDY_TMPDIR"
+  echo " Hostname: $SEEDY_HOST"
+  echo " rTorrent user: $RTORRENT_USER"
+  echo " Web user: $WWW_USER"
+  echo " Web password: $WWW_PASSWORD"
+}
 
 _SEEDY_UPDATE_SYSTEM () {
   apk upgrade --update
@@ -193,6 +197,7 @@ _SEEDY_START () {
   service rtorrentd start
 }
 
+_SEEDY_PRINT_INFO | tee  $SEEDY_TMPDIR/logs/info.log
 _SEEDY_UPDATE_SYSTEM &> $SEEDY_TMPDIR/logs/update.log
 _SEEDY_INSTALL_SOFTWARE &> $SEEDY_TMPDIR/logs/install.log
 _SEEDY_ADD_USER &> $SEEDY_TMPDIR/logs/user.log
