@@ -90,11 +90,9 @@ _SEEDY_INSTALL_RTORRENT () {
 _SEEDY_INSTALL_NGINX () {
   cd "$SEEDY_CURDIR"
 
-  create-crt() {
-      mkdir -p /etc/ssl/private/self/
-      openssl req -new -x509 -nodes -days 3650 -subj "/CN=$1" -keyout "/etc/ssl/private/self/$1.key" -out "/etc/ssl/private/self/$1.crt"
-      chmod 600 -R /etc/ssl/private/self/
-  }
+  mkdir -p /etc/ssl/private/self/
+  openssl req -new -x509 -nodes -days 3650 -subj "/CN=$SEEDY_HOST" -keyout "/etc/ssl/private/self/$SEEDY_HOST.key" -out "/etc/ssl/private/self/$SEEDY_HOST.crt"
+  chmod 600 -R /etc/ssl/private/self/
 
   create-crt $SEEDY_HOST
   htpasswd -bc /etc/nginx/htpasswd $RTORRENT_USER Banana
