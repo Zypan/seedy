@@ -98,7 +98,7 @@ _SEEDY_INSTALL_NGINX () {
   chmod 600 -R /etc/ssl/private/self/
 
   create-crt $SEEDY_HOST
-  htpasswd -bc /etc/nginx/htpasswd $RTORRENT_USER Banana
+  htpasswd -bc /etc/nginx/htpasswd $RTORRENT_USER "$WWW_PASSWORD"
 
   mkdir -p /var/cache/nginx
   chown $WWW_USER:$WWW_USER /var/cache/nginx
