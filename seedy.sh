@@ -95,7 +95,6 @@ _SEEDY_INSTALL_NGINX () {
   openssl req -new -x509 -nodes -days 3650 -subj "/CN=$SEEDY_HOST" -keyout "/etc/ssl/private/self/$SEEDY_HOST.key" -out "/etc/ssl/private/self/$SEEDY_HOST.crt"
   chmod 600 -R /etc/ssl/private/self/
 
-  create-crt $SEEDY_HOST
   htpasswd -bc /etc/nginx/htpasswd $RTORRENT_USER "$WWW_PASSWORD"
 
   mkdir -p /var/cache/nginx
