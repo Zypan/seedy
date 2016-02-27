@@ -118,6 +118,8 @@ _SEEDY_INSTALL_PHP () {
   sed -i 's/;listen.owner = nobody/listen.owner = nginx/g' /etc/php/php-fpm.conf
   sed -i 's/;listen.group = nobody/listen.group = nginx/g' /etc/php/php-fpm.conf
   sed -i 's/;listen.mode = 0660/listen.mode = 0660/g' /etc/php/php-fpm.conf
+  
+  rc-update add php-fpm
 }
 
 _SEEDY_INSTALL_RUTORRENT () {
