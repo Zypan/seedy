@@ -7,7 +7,7 @@ services:
 
 before_install:
 - docker pull alpine
-- docker run alpine /bin/ash -c "cd /root && wget https://raw.githubusercontent.com/thde/seedy/master/seedy.sh && chmod +x seedy.sh"
+- docker run alpine /bin/ash -c "apk add -U curl && cd /root && curl https://raw.githubusercontent.com/thde/seedy/master/seedy.sh > seedy.sh && chmod +x seedy.sh"
 
 script:
 - docker run alpine /bin/ash -c "cd /root && ./seedy.sh"
