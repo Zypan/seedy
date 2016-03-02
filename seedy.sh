@@ -72,7 +72,7 @@ _SEEDY_ADD_USER () {
 
 _SEEDY_INSTALL_RTORRENT () {
  curl -s https://raw.githubusercontent.com/thde/seedy/master/files/rtorrent.rc.tmpl > "/home/$RTORRENT_USER/.rtorrent.rc"
- SYSTEMRAM=$((grep MemTotal | awk '{ print $2 }') < /proc/meminfo )
+ SYSTEMRAM=( (grep MemTotal | awk '{ print $2 }') < /proc/meminfo )
  ROTRRENTRAM=$((SYSTEMRAM / 1024 * 90 / 100))
  sed -i s/TMPLRAM/"$ROTRRENTRAM"/g "/home/$RTORRENT_USER/.rtorrent.rc"
 
