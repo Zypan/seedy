@@ -3,7 +3,7 @@
 SEEDY_TMPDIR=$(mktemp -d)
 SEEDY_CURDIR="$PWD"
 SEEDY_HOST=${SEEDY_HOST:-$(hostname)}
-SEEDY_TEST=${SEEDY_TEST:false}
+SEEDY_TEST=${SEEDY_TEST:-false}
 WWW_USER=${WWW_USER:-nginx}
 WWW_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c15)
 RTORRENT_USER=${RTORRENT_USER:-rt}
