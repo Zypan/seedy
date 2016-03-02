@@ -26,7 +26,7 @@ _SEEDY_UPDATE_SYSTEM () {
 
 _SEEDY_INSTALL_MEDIAINFO_SOURCE () {
   mkdir "$SEEDY_TMPDIR/mediainfo"
-  cd "$SEEDY_TMPDIR/mediainfo"
+  cd "$SEEDY_TMPDIR/mediainfo" || return
   apk add build-base file libtool
 
   curl http://mediaarea.net/download/binary/mediainfo/0.7.82/MediaInfo_CLI_0.7.82_GNU_FromSource.tar.xz --output mediainfo.tar.xz
@@ -35,7 +35,7 @@ _SEEDY_INSTALL_MEDIAINFO_SOURCE () {
   cd MediaInfo/Project/GNU/CLI && make install
 
   apk del build-base file libtool
-  cd "$SEEDY_CURDIR"
+  cd "$SEEDY_CURDIR" || return
 }
 
 _SEEDY_INSTALL_SOFTWARE () {
@@ -72,8 +72,8 @@ _SEEDY_ADD_USER () {
 
 _SEEDY_INSTALL_RTORRENT () {
  curl -s https://raw.githubusercontent.com/thde/seedy/master/files/rtorrent.rc.tmpl > "/home/$RTORRENT_USER/.rtorrent.rc"
- SYSTEMRAM=$(cat /proc/meminfo | grep MemTotal | awk '{ print $2 }')
- ROTRRENTRAM=$(( $SYSTEMRAM / 1024 * 90 / 100))
+ SYSTEMRAM=$((grep MemTotal | awk '{ print $2 }') < /proc/meminfo )
+ ROTRRENTRAM=$((SYSTEMRAM / 1024 * 90 / 100))
  sed -i s/TMPLRAM/"$ROTRRENTRAM"/g "/home/$RTORRENT_USER/.rtorrent.rc"
 
  mkdir -p "/home/$RTORRENT_USER/.rtorrent/session"
@@ -89,7 +89,7 @@ _SEEDY_INSTALL_RTORRENT () {
 }
 
 _SEEDY_INSTALL_NGINX () {
-  cd "$SEEDY_CURDIR"
+  cd "$SEEDY_CURDIR" || return
 
   mkdir -p /etc/ssl/private/self/
   openssl req -new -x509 -nodes -days 3650 -subj "/CN=$SEEDY_HOST" -keyout "/etc/ssl/private/self/$SEEDY_HOST.key" -out "/etc/ssl/private/self/$SEEDY_HOST.crt"
