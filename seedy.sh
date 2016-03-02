@@ -73,7 +73,7 @@ _SEEDY_ADD_USER () {
 _SEEDY_INSTALL_RTORRENT () {
  curl -s https://raw.githubusercontent.com/thde/seedy/master/files/rtorrent.rc.tmpl > "/home/$RTORRENT_USER/.rtorrent.rc"
  SYSTEMRAM=$( (grep MemTotal | awk '{ print $2 }') < /proc/meminfo )
- ROTRRENTRAM=$((SYSTEMRAM / 1024 * 90 / 100))
+ ROTRRENTRAM=$((1024 * 90 / SYSTEMRAM / 100))
  sed -i s/TMPLRAM/"$ROTRRENTRAM"/g "/home/$RTORRENT_USER/.rtorrent.rc"
 
  mkdir -p "/home/$RTORRENT_USER/.rtorrent/session"
@@ -104,7 +104,7 @@ _SEEDY_INSTALL_NGINX () {
   curl -s https://raw.githubusercontent.com/thde/seedy/master/files/nginx.conf.tmpl > /etc/nginx/nginx.conf
 
   curl -s https://raw.githubusercontent.com/thde/seedy/master/files/virtualhost.conf.tmpl > "/etc/nginx/conf.d/$SEEDY_HOST.conf"
-  sed -i s/TMPLHOSTNAME/$SEEDY_HOST/g "/etc/nginx/conf.d/$SEEDY_HOST.conf"
+  sed -i s/TMPLHOSTNAME/"$SEEDY_HOST"/g "/etc/nginx/conf.d/$SEEDY_HOST.conf"
 
   rc-update add nginx
 }
