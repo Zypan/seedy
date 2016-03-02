@@ -73,7 +73,7 @@ _SEEDY_ADD_USER () {
 _SEEDY_INSTALL_RTORRENT () {
  curl -s https://raw.githubusercontent.com/thde/seedy/master/files/rtorrent.rc.tmpl > "/home/$RTORRENT_USER/.rtorrent.rc"
  SYSTEMRAM=$( (grep MemTotal | awk '{ print $2 }') < /proc/meminfo )
- ROTRRENTRAM=$((1024 * 90 / SYSTEMRAM / 100))
+ ROTRRENTRAM=$((SYSTEMRAM * 90 / 1024 / 100))
  sed -i s/TMPLRAM/"$ROTRRENTRAM"/g "/home/$RTORRENT_USER/.rtorrent.rc"
 
  mkdir -p "/home/$RTORRENT_USER/.rtorrent/session"
@@ -206,3 +206,5 @@ _SEEDY_INSTALL_RUTORRENT &> "$SEEDY_TMPDIR/logs/rutorrent.log"
 _SEEDY_CONFIG_FIREWALL &> "$SEEDY_TMPDIR/logs/firewall.log"
 _SEEDY_START &> "$SEEDY_TMPDIR/logs/start.log"
 _SEEDY_PRINT_INFO | tee  "$SEEDY_TMPDIR/logs/info.log"
+
+exit 0
