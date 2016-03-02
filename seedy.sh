@@ -3,11 +3,17 @@
 SEEDY_TMPDIR=$(mktemp -d)
 SEEDY_CURDIR="$PWD"
 SEEDY_HOST=${SEEDY_HOST:-$(hostname)}
+SEEDY_TEST=${SEEDY_TEST:false}
 WWW_USER=${WWW_USER:-nginx}
 WWW_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c15)
 RTORRENT_USER=${RTORRENT_USER:-rt}
 
 mkdir "$SEEDY_TMPDIR/logs"
+
+if [ "$SEEDY_TEST" = true ] ; then
+    echo 'Test Mode active'
+    set -e
+fi
 
 echo ""
 echo " Installing new Seedbox... "
@@ -196,15 +202,28 @@ _SEEDY_START () {
   service rtorrentd start
 }
 
-_SEEDY_UPDATE_SYSTEM &> "$SEEDY_TMPDIR/logs/update.log"
-_SEEDY_INSTALL_SOFTWARE &> "$SEEDY_TMPDIR/logs/install.log"
-_SEEDY_ADD_USER &> "$SEEDY_TMPDIR/logs/user.log"
-_SEEDY_INSTALL_RTORRENT &> "$SEEDY_TMPDIR/logs/rtorrent.log"
-_SEEDY_INSTALL_NGINX &> "$SEEDY_TMPDIR/logs/nginx.log"
-_SEEDY_INSTALL_PHP &> "$SEEDY_TMPDIR/logs/php.log"
-_SEEDY_INSTALL_RUTORRENT &> "$SEEDY_TMPDIR/logs/rutorrent.log"
-_SEEDY_CONFIG_FIREWALL &> "$SEEDY_TMPDIR/logs/firewall.log"
-_SEEDY_START &> "$SEEDY_TMPDIR/logs/start.log"
-_SEEDY_PRINT_INFO | tee  "$SEEDY_TMPDIR/logs/info.log"
+if [ "$SEEDY_TEST" = true ] ; then
+  _SEEDY_UPDATE_SYSTEM | tee  "$SEEDY_TMPDIR/logs/update.log"
+  _SEEDY_INSTALL_SOFTWARE | tee  "$SEEDY_TMPDIR/logs/install.log"
+  _SEEDY_ADD_USER | tee  "$SEEDY_TMPDIR/logs/user.log"
+  _SEEDY_INSTALL_RTORRENT | tee  "$SEEDY_TMPDIR/logs/rtorrent.log"
+  _SEEDY_INSTALL_NGINX | tee  "$SEEDY_TMPDIR/logs/nginx.log"
+  _SEEDY_INSTALL_PHP | tee  "$SEEDY_TMPDIR/logs/php.log"
+  _SEEDY_INSTALL_RUTORRENT | tee  "$SEEDY_TMPDIR/logs/rutorrent.log"
+  _SEEDY_CONFIG_FIREWALL | tee  "$SEEDY_TMPDIR/logs/firewall.log"
+  _SEEDY_START | tee  "$SEEDY_TMPDIR/logs/start.log"
+  _SEEDY_PRINT_INFO | tee  "$SEEDY_TMPDIR/logs/info.log"
+else
+  _SEEDY_UPDATE_SYSTEM &> "$SEEDY_TMPDIR/logs/update.log"
+  _SEEDY_INSTALL_SOFTWARE &> "$SEEDY_TMPDIR/logs/install.log"
+  _SEEDY_ADD_USER &> "$SEEDY_TMPDIR/logs/user.log"
+  _SEEDY_INSTALL_RTORRENT &> "$SEEDY_TMPDIR/logs/rtorrent.log"
+  _SEEDY_INSTALL_NGINX &> "$SEEDY_TMPDIR/logs/nginx.log"
+  _SEEDY_INSTALL_PHP &> "$SEEDY_TMPDIR/logs/php.log"
+  _SEEDY_INSTALL_RUTORRENT &> "$SEEDY_TMPDIR/logs/rutorrent.log"
+  _SEEDY_CONFIG_FIREWALL &> "$SEEDY_TMPDIR/logs/firewall.log"
+  _SEEDY_START &> "$SEEDY_TMPDIR/logs/start.log"
+  _SEEDY_PRINT_INFO | tee  "$SEEDY_TMPDIR/logs/info.log"
+fi
 
 exit 0
