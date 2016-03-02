@@ -25,8 +25,8 @@ _SEEDY_UPDATE_SYSTEM () {
 }
 
 _SEEDY_INSTALL_MEDIAINFO_SOURCE () {
-  mkdir $SEEDY_TMPDIR/mediainfo
-  cd $SEEDY_TMPDIR/mediainfo
+  mkdir "$SEEDY_TMPDIR/mediainfo"
+  cd "$SEEDY_TMPDIR/mediainfo"
   apk add build-base file libtool
 
   curl http://mediaarea.net/download/binary/mediainfo/0.7.82/MediaInfo_CLI_0.7.82_GNU_FromSource.tar.xz --output mediainfo.tar.xz
@@ -35,7 +35,7 @@ _SEEDY_INSTALL_MEDIAINFO_SOURCE () {
   cd MediaInfo/Project/GNU/CLI && make install
 
   apk del build-base file libtool
-  cd $SEEDY_CURDIR
+  cd "$SEEDY_CURDIR"
 }
 
 _SEEDY_INSTALL_SOFTWARE () {
@@ -59,31 +59,31 @@ _SEEDY_INSTALL_SOFTWARE () {
 }
 
 _SEEDY_ADD_USER () {
-  adduser -D $RTORRENT_USER
+  adduser -D "$RTORRENT_USER"
 
   mkdir -p "/home/$RTORRENT_USER/watch"
   mkdir -p "/home/$RTORRENT_USER/files/incomplete"
   mkdir "/home/$RTORRENT_USER/.ssh"
 
-  chmod -R 600 /home/$RTORRENT_USER/.ssh
-  chmod 700 /home/$RTORRENT_USER/.ssh
-  chown -R $RTORRENT_USER:$RTORRENT_USER /home/$RTORRENT_USER
+  chmod -R 600 "/home/$RTORRENT_USER/.ssh"
+  chmod 700 "/home/$RTORRENT_USER/.ssh"
+  chown -R "$RTORRENT_USER":"$RTORRENT_USER" "/home/$RTORRENT_USER"
 }
 
 _SEEDY_INSTALL_RTORRENT () {
- curl -s https://raw.githubusercontent.com/thde/seedy/master/files/rtorrent.rc.tmpl > /home/$RTORRENT_USER/.rtorrent.rc
+ curl -s https://raw.githubusercontent.com/thde/seedy/master/files/rtorrent.rc.tmpl > "/home/$RTORRENT_USER/.rtorrent.rc"
  SYSTEMRAM=$(cat /proc/meminfo | grep MemTotal | awk '{ print $2 }')
- ROTRRENTRAM=$(expr $SYSTEMRAM / 1024 \* 90 / 100)
- sed -i s/TMPLRAM/$ROTRRENTRAM/g /home/$RTORRENT_USER/.rtorrent.rc
+ ROTRRENTRAM=$(( $SYSTEMRAM / 1024 * 90 / 100))
+ sed -i s/TMPLRAM/"$ROTRRENTRAM"/g "/home/$RTORRENT_USER/.rtorrent.rc"
 
- mkdir -p /home/$RTORRENT_USER/.rtorrent/session
- chown -R $RTORRENT_USER:$RTORRENT_USER /home/$RTORRENT_USER/.rtorrent
- chown $RTORRENT_USER:$RTORRENT_USER /home/$RTORRENT_USER/.rtorrent.rc
- chown -R $RTORRENT_USER:nginx /home/$RTORRENT_USER/.rtorrent/session
- chmod g+s /home/$RTORRENT_USER/.rtorrent/session
+ mkdir -p "/home/$RTORRENT_USER/.rtorrent/session"
+ chown -R "$RTORRENT_USER":"$RTORRENT_USER" "/home/$RTORRENT_USER/.rtorrent"
+ chown "$RTORRENT_USER":"$RTORRENT_USER" "/home/$RTORRENT_USER/.rtorrent.rc"
+ chown -R "$RTORRENT_USER":nginx "/home/$RTORRENT_USER/.rtorrent/session"
+ chmod g+s "/home/$RTORRENT_USER/.rtorrent/session"
 
  curl -s https://raw.githubusercontent.com/thde/seedy/master/files/rtorrentd.init.tmpl > /etc/init.d/rtorrentd
- sed -i s/TMPLUSER/$RTORRENT_USER/g /etc/init.d/rtorrentd
+ sed -i s/TMPLUSER/"$RTORRENT_USER"/g /etc/init.d/rtorrentd
  chmod +x /etc/init.d/rtorrentd
  rc-update add rtorrentd
 }
@@ -95,16 +95,16 @@ _SEEDY_INSTALL_NGINX () {
   openssl req -new -x509 -nodes -days 3650 -subj "/CN=$SEEDY_HOST" -keyout "/etc/ssl/private/self/$SEEDY_HOST.key" -out "/etc/ssl/private/self/$SEEDY_HOST.crt"
   chmod 600 -R /etc/ssl/private/self/
 
-  htpasswd -bcB /etc/nginx/htpasswd $RTORRENT_USER "$WWW_PASSWORD"
+  htpasswd -bcB /etc/nginx/htpasswd "$RTORRENT_USER" "$WWW_PASSWORD"
 
   mkdir -p /var/cache/nginx
-  chown $WWW_USER:$WWW_USER /var/cache/nginx
+  chown "$WWW_USER":"$WWW_USER" /var/cache/nginx
 
   cp -f /etc/nginx/nginx.conf /etc/nginx/nginx.conf.orig
   curl -s https://raw.githubusercontent.com/thde/seedy/master/files/nginx.conf.tmpl > /etc/nginx/nginx.conf
 
-  curl -s https://raw.githubusercontent.com/thde/seedy/master/files/virtualhost.conf.tmpl > /etc/nginx/conf.d/$SEEDY_HOST.conf
-  sed -i s/TMPLHOSTNAME/$SEEDY_HOST/g /etc/nginx/conf.d/$SEEDY_HOST.conf
+  curl -s https://raw.githubusercontent.com/thde/seedy/master/files/virtualhost.conf.tmpl > "/etc/nginx/conf.d/$SEEDY_HOST.conf"
+  sed -i s/TMPLHOSTNAME/$SEEDY_HOST/g "/etc/nginx/conf.d/$SEEDY_HOST.conf"
 
   rc-update add nginx
 }
@@ -118,7 +118,7 @@ _SEEDY_INSTALL_PHP () {
   sed -i 's/;listen.owner = nobody/listen.owner = nginx/g' /etc/php/php-fpm.conf
   sed -i 's/;listen.group = nobody/listen.group = nginx/g' /etc/php/php-fpm.conf
   sed -i 's/;listen.mode = 0660/listen.mode = 0660/g' /etc/php/php-fpm.conf
-  
+
   rc-update add php-fpm
 }
 
@@ -196,13 +196,13 @@ _SEEDY_START () {
   service rtorrentd start
 }
 
-_SEEDY_UPDATE_SYSTEM &> $SEEDY_TMPDIR/logs/update.log
-_SEEDY_INSTALL_SOFTWARE &> $SEEDY_TMPDIR/logs/install.log
-_SEEDY_ADD_USER &> $SEEDY_TMPDIR/logs/user.log
-_SEEDY_INSTALL_RTORRENT &> $SEEDY_TMPDIR/logs/rtorrent.log
-_SEEDY_INSTALL_NGINX &> $SEEDY_TMPDIR/logs/nginx.log
-_SEEDY_INSTALL_PHP &> $SEEDY_TMPDIR/logs/php.log
-_SEEDY_INSTALL_RUTORRENT &> $SEEDY_TMPDIR/logs/rutorrent.log
-_SEEDY_CONFIG_FIREWALL &> $SEEDY_TMPDIR/logs/firewall.log
-_SEEDY_START &> $SEEDY_TMPDIR/logs/start.log
-_SEEDY_PRINT_INFO | tee  $SEEDY_TMPDIR/logs/info.log
+_SEEDY_UPDATE_SYSTEM &> "$SEEDY_TMPDIR/logs/update.log"
+_SEEDY_INSTALL_SOFTWARE &> "$SEEDY_TMPDIR/logs/install.log"
+_SEEDY_ADD_USER &> "$SEEDY_TMPDIR/logs/user.log"
+_SEEDY_INSTALL_RTORRENT &> "$SEEDY_TMPDIR/logs/rtorrent.log"
+_SEEDY_INSTALL_NGINX &> "$SEEDY_TMPDIR/logs/nginx.log"
+_SEEDY_INSTALL_PHP &> "$SEEDY_TMPDIR/logs/php.log"
+_SEEDY_INSTALL_RUTORRENT &> "$SEEDY_TMPDIR/logs/rutorrent.log"
+_SEEDY_CONFIG_FIREWALL &> "$SEEDY_TMPDIR/logs/firewall.log"
+_SEEDY_START &> "$SEEDY_TMPDIR/logs/start.log"
+_SEEDY_PRINT_INFO | tee  "$SEEDY_TMPDIR/logs/info.log"
