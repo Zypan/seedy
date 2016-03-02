@@ -9,4 +9,4 @@ before_install:
 - docker pull alpine
 
 script:
-- docker run alpine /bin/ash -c "apk add -U curl && cd /root && curl https://raw.githubusercontent.com/thde/seedy/master/seedy.sh | ash"
+- docker run alpine /bin/ash -c "apk add -U curl && cd /root && export SEEDY_TEST=true && curl https://raw.githubusercontent.com/thde/seedy/master/seedy.sh | ash"
