@@ -34,9 +34,9 @@ schedule = watch_directory_ptp,5,5,"load.start=~/watch/passthepopcorn.me/*.torre
 # downloading.
 schedule = low_diskspace,5,60,close_low_diskspace=200M
 
-# This chmods the downloaded files to 770.  This will allow them to be deleted
+# This chmods the downloaded files to 750.  This will allow them to be deleted
 # by w/ruTorrent, while not allowing any other users to touch them.
-system.umask.set = 007
+system.umask.set = 027
 
 #################################################
 ## Connection settings                         ##
