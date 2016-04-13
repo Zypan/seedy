@@ -81,7 +81,7 @@ _SEEDY_INSTALL_RTORRENT () {
  curl -s https://raw.githubusercontent.com/thde/seedy/master/files/rtorrent.rc.tmpl > "/home/$RTORRENT_USER/.rtorrent.rc"
  SYSTEMRAM=$( (grep MemTotal | awk '{ print $2 }') < /proc/meminfo )
  ROTRRENTRAM=$((SYSTEMRAM * 90 / 1024 / 100))
- sed -i s/TMPLRAM/"$ROTRRENTRAM"/g "/home/$RTORRENT_USER/.rtorrent.rc"
+ sed -i s/TMPLRAM/"${ROTRRENTRAM}M"/g "/home/$RTORRENT_USER/.rtorrent.rc"
 
  mkdir -p "/home/$RTORRENT_USER/.rtorrent/session"
  chown -R "$RTORRENT_USER":"$RTORRENT_USER" "/home/$RTORRENT_USER/.rtorrent"
