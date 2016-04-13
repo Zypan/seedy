@@ -12,6 +12,7 @@ mkdir "$SEEDY_TMPDIR/logs"
 
 if [ "$SEEDY_TEST" = true ] ; then
     echo 'Test Mode active'
+    set -x
     set -e
 fi
 
