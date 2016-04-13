@@ -32,7 +32,7 @@ schedule = watch_directory_ptp,5,5,"load.start=~/watch/passthepopcorn.me/*.torre
 
 # If there's less than 5GB of disk space, it will stop torrents from
 # downloading.
-schedule = low_diskspace,5,60,close_low_diskspace=5120M
+schedule = low_diskspace,5,60,close_low_diskspace=200M
 
 # This chmods the downloaded files to 770.  This will allow them to be deleted
 # by w/ruTorrent, while not allowing any other users to touch them.
