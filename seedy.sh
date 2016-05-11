@@ -1,5 +1,15 @@
 #!/bin/ash
 
+# seedy.sh - v0.1
+
+# This script will install a seedbox including rTorrent and ruTorrent on an Alpine Linux server. Only install this on a fresh Alpine Linux installation.
+#
+# You can configure the hostname and user BEFORE running ./seedy.sh:
+# export SEEDY_HOST=sammy.example.com
+# export RTORRENT_USER=marco
+
+
+
 SEEDY_TMPDIR=$(mktemp -d)
 SEEDY_CURDIR="$PWD"
 SEEDY_HOST=${SEEDY_HOST:-$(hostname)}
@@ -11,7 +21,7 @@ RTORRENT_USER=${RTORRENT_USER:-rt}
 mkdir "$SEEDY_TMPDIR/logs"
 
 if [ "$SEEDY_TEST" = true ] ; then
-    echo 'Test Mode active'
+    echo "Test mode active"
     set -x
     set -e
 fi
