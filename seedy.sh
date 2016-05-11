@@ -223,6 +223,7 @@ if [ "$SEEDY_TEST" = true ] ; then
   _SEEDY_INSTALL_RUTORRENT
 
   nginx -t
+  php-fpm -t
 
   exit 0
 fi
