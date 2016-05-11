@@ -221,7 +221,10 @@ if [ "$SEEDY_TEST" = true ] ; then
   _SEEDY_INSTALL_NGINX
   _SEEDY_INSTALL_PHP
   _SEEDY_INSTALL_RUTORRENT
-  _SEEDY_PRINT_INFO
+
+  nginx -t
+  service php-fpm start
+  service rtorrentd start
 
   exit 0
 fi
