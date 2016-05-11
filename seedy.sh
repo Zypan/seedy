@@ -8,8 +8,7 @@
 # export SEEDY_HOST=sammy.example.com
 # export RTORRENT_USER=marco
 
-
-
+# set configuration
 SEEDY_TMPDIR=$(mktemp -d)
 SEEDY_CURDIR="$PWD"
 SEEDY_HOST=${SEEDY_HOST:-$(hostname)}
@@ -30,6 +29,7 @@ echo ""
 echo " Installing new Seedbox... "
 echo ""
 
+# prints configuration and login information
 _SEEDY_PRINT_INFO () {
   echo " Temporary folder: $SEEDY_TMPDIR"
   echo " Hostname: $SEEDY_HOST"
@@ -90,7 +90,7 @@ _SEEDY_ADD_USER () {
 _SEEDY_INSTALL_RTORRENT () {
  curl -s https://raw.githubusercontent.com/thde/seedy/master/files/rtorrent.rc.tmpl > "/home/$RTORRENT_USER/.rtorrent.rc"
  SYSTEMRAM=$( (grep MemTotal | awk '{ print $2 }') < /proc/meminfo )
- ROTRRENTRAM=$((SYSTEMRAM * 90 / 1024 / 100))
+ ROTRRENTRAM=$(expr $SYSTEMRAM \* 90 / 100 / 1024)
  sed -i s/TMPLRAM/"${ROTRRENTRAM}M"/g "/home/$RTORRENT_USER/.rtorrent.rc"
 
  mkdir -p "/home/$RTORRENT_USER/.rtorrent/session"
@@ -212,6 +212,21 @@ _SEEDY_START () {
   service php-fpm start
   service rtorrentd start
 }
+
+if [ "$SEEDY_TEST" = true ] ; then
+  _SEEDY_UPDATE_SYSTEM
+  _SEEDY_INSTALL_SOFTWARE
+  _SEEDY_ADD_USER
+  _SEEDY_INSTALL_RTORRENT
+  _SEEDY_INSTALL_NGINX
+  _SEEDY_INSTALL_PHP
+  _SEEDY_INSTALL_RUTORRENT
+  _SEEDY_CONFIG_FIREWALL
+  _SEEDY_START
+  _SEEDY_PRINT_INFO
+
+  exit 0
+fi
 
 _SEEDY_UPDATE_SYSTEM &> "$SEEDY_TMPDIR/logs/update.log"
 _SEEDY_INSTALL_SOFTWARE &> "$SEEDY_TMPDIR/logs/install.log"
